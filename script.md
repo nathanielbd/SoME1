@@ -164,4 +164,6 @@ In the case of a raised exception from within the try block, the computer will r
 
 It stands to say that this algorithm, invented by Hendrik Lenstra-- Lenstra's algorithm-- is an *exceptionally* clever algorithm. Perhaps more intriguing is that this algorithm does just fail, but accomplishes its goal by failing the compute a value. If only math tests were like that! Thanks for watching.
 
-> 
+> still image of Lenstra's filled-in Escher painting above the following quote: "The main application of Pure Mathematics is to make you happy"
+
+> acknowledgements for the HPS textbook, Manim, etc.
