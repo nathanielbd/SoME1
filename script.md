@@ -23,6 +23,10 @@ Also perhaps draw an arrow with a label with each transition.
 - Elliptic curves --> have the properties of --> Groups
 - Groups --> EC group operations are computed with --> Extended Euclidean algorithm
 
+## Music
+
+Not sure yet. Soothing piano music on CC liscence perhaps.
+
 ## Script
 > screen capture of programming a try-catch block 'Fireship' style
 
