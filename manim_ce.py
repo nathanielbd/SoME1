@@ -38,6 +38,94 @@ class ThumbnailFF(Scene):
 		dots = VGroup(*[Dot(point=ax.coords_to_point(pt[0], pt[1]), color=ORANGE, radius=0.15) for pt in pts])
 		self.add(ax, dots)
 
+class Fermat(Scene):
+	def construct(self):
+		wiles = ImageMobject('media/images/wiles.jpg').shift(3*LEFT)
+		text = Text('Andrew Wiles \n (1953-Present)').shift(3*RIGHT)
+		self.play(FadeIn(wiles))
+		self.play(AddTextLetterByLetter(text))
+		self.wait(2)
+
+import random
+
+class TitleCard(MovingCameraScene):
+	def construct(self):
+		ax = Axes(
+			x_range=[-4, 4],
+			y_range=[-4, 4],
+			# axis_config={'stroke_width': 6},
+			axis_config={'include_ticks': False},
+			tips=False
+		)
+		ec = ImplicitFunction(
+			lambda x, y: y**2 - x**3,
+			x_max=4,
+			x_min=-4,
+			y_max=4,
+			y_min=-4
+		)
+		self.play(
+			Create(ax),
+			Create(ec)
+		)
+		for i in range(3):
+			A = random.randint(-3, 3)
+			B = random.randint(-3, 3)
+			new_ec = ImplicitFunction(
+				lambda x, y: y**2 - x**3 - A*x - B,
+				x_max=4,
+				x_min=-4,
+				y_max=4,
+				y_min=-4
+			)
+			self.play(
+				Transform(ec, new_ec)
+			)
+			self.wait(1)
+		title = Text('The algorithm built to fail').scale(100)
+		self.add(title)
+		self.play(self.camera.frame.animate.scale(100))
+
+class GroupTransition(ThreeDScene):
+	def construct(self):
+		q1 = Text('How will we use elliptic curves?')
+		self.play(GrowFromCenter(q1))
+		self.play(q1.animate.shift(UP))
+		# q2 = MarkupText('What are elliptic curves?').next_to(q1, DOWN)
+		q2_mu = MarkupText('What <i>are</i> elliptic curves?').next_to(q1, DOWN)
+		# self.play(GrowFromCenter(q2))
+		# self.play(TransformMatchingShapes(q2, q2_mu))
+		self.play(GrowFromCenter(q2_mu))
+		group = Text('Group Structure').set_color(GREEN).scale(0.01)\
+			# .rotate_about_origin(PI)
+		self.add(group)
+		self.move_camera(theta=1.5*PI, added_anims=[group.animate.scale(100), Uncreate(q2_mu), Uncreate(q1)])
+		self.wait(1)
+
+class GroupRules(Scene):
+	def construct(self):
+		g = MathTex(r'\text{Group}: \{G, +\}')
+		self.play(FadeIn(g))
+		r1 = MathTex(r'\text{For all } a, b, c \text{ in } G \text{ such that }(a + b) + c = a + (b + c)')
+		self.wait(1)
+		self.play(
+			g.animate.shift(UP),
+			FadeIn(r1)
+		)
+		r2 = MathTex(r'\text{There exists } 0 \text{ in } G \text{ such that for all } a \text{ in } G, 0 + a = a = a + 0')
+		self.wait(1)
+		self.play(
+			g.animate.shift(UP),
+			r1.animate.shift(UP),
+			FadeIn(r2)
+		)
+		r3 = MathTex(r'\text{For all } a \text{ in } G \text{ there exists } -a \text{ in } G \\ \text{ such that } a + -a = 0 = -a + a').shift(DOWN)
+		self.wait(1)
+		self.play(
+			FadeIn(r3)
+		)
+		self.wait(1)
+
 """
 Reference to Jon Bois's 17776
 """
@@ -220,68 +308,56 @@ class Identity(Scene):
 		self.play(Transform(p, p_sum))
 		self.play(Transform(p, id))
 
+class Identity2(Scene):
+	def construct(self):
+		x = MathTex('x').set_color(RED)
+		x_sum = MathTex('x', '+0')
+		x_sum[0].set_color(RED)
+		x_copy = x.copy()
+		p = MathTex('P').set_color(RED)
+		p_sum = MathTex('P', r'+\mathcal{O}')
+		p_sum[0].set_color(RED)
+		p_copy = p.copy()
+		self.add(x)
+		self.play(Transform(x, x_sum))
+		self.play(Transform(x, x_copy))
+		self.play(
+			x.animate.shift(UP),
+			FadeIn(p)
+		)
+		self.play(Transform(p, p_sum))
+		self.play(Transform(p, p_copy))
+
 class AdditionAlgorithm(Scene):
 	def construct(self):
 		formula = MathTex('Y^2 = X^3 + ', 'A', 'X +', 'B').shift(UP*3)
-		# vroom
-		# formula[1].set_color(YELLOW)
-		# formula[3].set_color(ORANGE)
 		a = MathTex(r'\text{if }', 'P', r'=\mathcal{O}\text{, then }', 'P',  '+', 'Q', '=', 'Q').next_to(formula, DOWN)
-		# a[1].set_color(PURPLE)
-		# a[3].set_color(PURPLE)
-		# a[5].set_color(GREEN)
-		# a[7].set_color(GREEN)
 		b = MathTex(r'\text{else if }', 'Q', r'=\mathcal{O}\text{, then }', 'P', '+', 'Q', '=', 'P').next_to(a, DOWN)
-		# b[1].set_color(GREEN)
-		# b[3].set_color(PURPLE)
-		# b[5].set_color(GREEN)
-		# b[7].set_color(PURPLE)
 		c = MathTex(r'\text{else let }' , 'P', '=(', 'x_p', ',', 'y_p', r') \text{ and }', 'Q', '=(', 'x_q', ',', 'y_q', ')').next_to(b, DOWN)
-		# c[1].set_color(PURPLE)
-		# c[3].set_color(PURPLE)
-		# c[5].set_color(PURPLE)
-		# c[7].set_color(GREEN)
-		# c[9].set_color(GREEN)
-		# c[11].set_color(GREEN)
-		# self.add(formula, a, b, c)
 		d = MathTex(r'\text{if }', 'x_p', '=', 'x_q', r'\text{ and }', 'y_p', '= -', 'y_q', r'\text{, then }', 'P', '+', 'Q', r'=\mathcal{O}').next_to(c, DOWN)
-		# d[1].set_color(PURPLE)
-		# d[3].set_color(GREEN)
-		# d[5].set_color(PURPLE)
-		# d[7].set_color(GREEN)
-		# d[9].set_color(PURPLE)
-		# d[11].set_color(GREEN)
-		# self.add(d)
 		e = MathTex(r'\text{else let } \lambda=\begin{cases}\frac{y_q-y_p}{x_q-x_p} & \text{if }P\not=Q\\ \frac{3x_p^2 +A}{2y_p} & \text{if }P=Q\end{cases}').next_to(d, DOWN)
-		# e = MathTex(r'\text{else let } \lambda=\begin{cases}\frac{', 'y_q', '-',  'y_p', '}{', 'x_q', '-', 'x_p', r'} & \text{if }', 'P', \
-		# 	r'\not=', 'Q', r'\\ \frac{3', 'x_p', '^2 +', 'A', '}{2', 'y_p', r'} & \text{if }', 'P', '=', 'Q', r'\end{cases}')
-		# e[1].set_color(GREEN)
-		# e[3].set_color(PURPLE)
-		# e[5].set_color(GREEN)
-		# e[7].set_color(GREEN)
-		# e[9].set_color(PURPLE)
-		# e[11].set_color(PURPLE)
-		# e[13].set_color(GREEN)
-		# e[15].set_color(PURPLE)
-		# e[17].set_color(YELLOW)
-		# e[19].set_color(PURPLE)
-		# e[21].set_color(PURPLE)
-		# e[23].set_color(GREEN)
-		# self.add(e)
 		f = MathTex(r'\text{let }x_r = \lambda^2 - x_p - x_q\text{ and } y_r = \lambda(x_1-x_3)- y_1').next_to(e, DOWN)
-		g = MathTex(r'\text{let }R = (x_r, y_r){, then }P + Q = R').next_to(f, DOWN)
+		g = MathTex(r'\text{let }R = (x_r, y_r) \text{, then }P + Q = R').next_to(f, DOWN)
 		self.play(FadeIn(formula))
+		self.wait(1)
 		self.play(
 			FadeIn(a),
 			FadeIn(b)
 		)
+		self.wait(1)
 		self.play(FadeIn(c))
+		self.wait(1)
 		self.play(FadeIn(d))
+		self.wait(1)
 		self.play(FadeIn(e))
+		self.wait(1)
 		self.play(FocusOn(e))
 		self.play(Indicate(formula))
+		self.wait(1)
 		self.play(FadeIn(f))
+		self.wait(1)
 		self.play(FadeIn(g))
+		self.wait(1)
 
 class ECtoFF(Scene):
 	def construct(self):
@@ -416,7 +492,76 @@ class GCDEx(MovingCameraScene):
 		# add birds eye view of topics next
 		# mul_inv = Text('Multiplicative Inverse').
 
-import random
+class Aha(Scene):
+	def construct(self):
+		what_if = MathTex(r'\text{What if }\gcd(a, N) \not= 1\text{?}')
+		self.play(GrowFromCenter(what_if))
+
+"""
+Example 6.23 in book
+"""
+
+class Ex623(MovingCameraScene):
+	def construct(self):
+		self.camera.frame.save_state()
+		ax = Axes(
+			x_range=[-60, 187],
+			y_range=[-60, 187],
+			axis_config={'include_ticks': False},
+			tips=False
+		)
+		diffs = np.array([[(y**2 - x**3 - 3*x - 7) % 187 for y in range(187)] for x in range(187)])
+		pts = np.argwhere(diffs==0)
+		dots = VGroup(*[Dot(point=ax.coords_to_point(pt[0], pt[1]), color=ORANGE) for pt in pts])
+		self.add(ax, dots)
+		p_label = MathTex('P').next_to(dots[30], DOWN)
+		# 2P is 38
+		# 3P is 46
+		p2_label = MathTex('2P').next_to(dots[38], UP)
+		p3_label = MathTex('3P').next_to(dots[46], RIGHT+DOWN)
+		formula = MathTex(r'E: Y^2 = X^3 + 3X + 7 \mod 187').move_to([1, -2.5, 0])
+		self.add(formula)
+		self.play(
+			Indicate(dots[30]),
+			GrowFromCenter(p_label)
+		)
+		self.play(
+			Indicate(dots[38]),
+			GrowFromCenter(p2_label)
+		)
+		self.play(
+			Indicate(dots[46]),
+			GrowFromCenter(p3_label)
+		)
+		self.play(
+			self.camera.frame.animate.shift(DOWN*6)
+		)
+		ps = MathTex(r'2P &= (', '43', r', 126) \\ 3P &= (', '54', ', 105)').next_to(formula, DOWN)
+		p5 = MathTex('5P = 2P + 3P').next_to(ps, DOWN)
+		slope = MathTex(r'\lambda=\begin{cases}\frac{y_3-y_2}{x_3-x_2} & \text{if }2P\not=3P\\ \frac{3x_2^2 +A}{2y_2} & \text{if }2P=3P\end{cases}').next_to(p5, DOWN)
+		slope_case = MathTex(r'\lambda=', r'\frac{y_3-y_2}{x_3-x_2}').move_to(slope.get_center())
+		slope_inv = MathTex(r'\lambda=y_3-y_2 \cdot', r'\frac{1}{x_3-x_2}').move_to(slope.get_center())
+		slope_plug = MathTex(r'\lambda=y_3-y_2 \cdot \frac{1}{54 - 43} = y_3-y_2 \cdot \frac{1}{11} \mod 187').move_to(slope.get_center())
+		euclid_out = MathTex(r'au + Nv = \gcd(a, N)').next_to(slope, DOWN)
+		euclid_plug = MathTex(r'11u + 187v = \gcd(11, 187)').move_to(euclid_out.get_center())
+		euclid_final = MathTex(r'11u + 187v = \gcd(11, 187) = 11').move_to(euclid_out.get_center())
+		self.play(Write(ps))
+		self.play(Write(p5))
+		self.play(Write(slope))
+		self.play(TransformMatchingShapes(slope, slope_case))
+		self.play(Circumscribe(slope_case[1]))
+		self.play(TransformMatchingShapes(slope_case, slope_inv))
+		self.play(ShowPassingFlash(Underline(slope_inv[1])))
+		self.play(
+			TransformMatchingShapes(slope_inv, slope_plug),
+			Indicate(ps[1]),
+			Indicate(ps[3])
+		)
+		self.play(Write(euclid_out))
+		self.play(TransformMatchingShapes(euclid_out, euclid_plug))
+		self.play(Transform(euclid_plug, euclid_final))
+		factors = MathTex(r'11 \cdot 17 = 187').next_to(euclid_out, DOWN)
+		self.play(Write(factors))
 
 class RandomECs(Scene):
 	def construct(self):
@@ -480,3 +625,37 @@ class RandomECs(Scene):
 				b_dial.animate.move_to([-6, 0, 0] + b/(N-1)*2*RIGHT),
 				Transform(dots, new_dots)
 			)
+
+class Lenstra(Scene):
+	def construct(self):
+		img1 = ImageMobject('media/images/Hendrik_Lenstra_MFO.jpg').scale(2)
+		img2 = ImageMobject('media/images/lenstra.jfif').scale(2)
+		img3 = ImageMobject('media/images/lenstra_award.jfif').scale(2)
+		self.play(FadeIn(img1))
+		self.wait(2)
+		self.play(
+			FadeOut(img1),
+			FadeIn(img2)
+		)
+		self.wait(2)
+		self.play(
+			FadeOut(img2),
+			FadeIn(img3)
+		)
+
+class EndQuote(Scene):
+	def construct(self):
+		escher_blank = ImageMobject('media/images/escher_blank.jpg').scale(600/930).shift(LEFT*4)
+		escher_filled = ImageMobject('media/images/escher_filled.jfif').scale(600/390).shift(LEFT*4)
+		self.play(FadeIn(escher_blank))
+		quote = Text(
+			"The main application of \n"
+			"Pure Mathematics is to \n"
+			"make you happy \n"
+			"		---Hendrik Lenstra"
+		).shift(RIGHT*3)
+		self.play(AddTextLetterByLetter(quote))
+		self.play(
+			FadeOut(escher_blank),
+			FadeIn(escher_filled)
+		)

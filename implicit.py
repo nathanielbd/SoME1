@@ -23,7 +23,7 @@ class ImplicitFunction(VMobject):
 #         "res": 50
 #     }
 
-    def __init__(self, function=None, x_max=None, x_min=None, y_max=None, y_min=None, res=50, **kwargs):
+    def __init__(self, function=None, x_max=None, x_min=None, y_max=None, y_min=None, res=100, **kwargs):
         """
         :param function: Function of k and y to graph isocontour f(x,y)=0
         """
