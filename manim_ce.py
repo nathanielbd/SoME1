@@ -8,22 +8,43 @@ Throw `ThumbnailEC` and `ThumbnailFF` into Figma for final
 class ThumbnailEC(Scene):
 	def construct(self):
 		ax = Axes(
-			x_range=[-3, 6],
-			y_range=[-15, 15],
-			axis_config={'stroke_width': 10},
+			x_range=[-1.3247, 2],
+			y_range=[-1.3247, 2],
+			# axis_config={'stroke_width': 10},
 			tips=False
 		)
 		graph_top = ax.get_graph(
-			lambda x: np.sqrt(x**3 - 3*x + 18),
-			stroke_width=20,
+			lambda x: np.sqrt(x**3 - x + 1),
+			# stroke_width=20,
 			color=ORANGE
 		)
 		graph_bottom = ax.get_graph(
-			lambda x: -np.sqrt(x**3 - 3*x + 18),
-			stroke_width=20,
+			lambda x: -np.sqrt(x**3 - x + 1),
+			# stroke_width=20,
 			color=ORANGE
 		)
+		line = ax.get_graph(
+			lambda x: 1.1768178191460862263895685743891796710401469824300166243248806887
+		)
+		dot = Dot(ax.coords_to_point(-0.5773502691896257645091487805019574556476017512701268760186023264, 1.1768178191460862263895685743891796710401469824300166243248806887))
+		label = MathTex('P').next_to(dot, UP)
+		dot2 = Dot(ax.coords_to_point(1.1547, 1.17682))
+		label2 = MathTex('Q').next_to(dot2, UP)
+		# self.add(ax, graph_top, graph_bottom, dot, line, dot2)
 		self.add(ax, graph_top, graph_bottom)
+		self.play(
+			GrowFromCenter(dot),
+			GrowFromCenter(label)
+		)
+		self.play(Create(line))
+		self.play(
+			GrowFromCenter(dot2),
+			GrowFromCenter(label2)
+		)
+		eq = MathTex('P + P = Q').shift(3*RIGHT+DOWN)
+		self.play(
+			Write(eq)
+		)
 
 class ThumbnailFF(Scene):
 	def construct(self):
@@ -229,12 +250,12 @@ class PointAddition(MovingCameraScene):
 		q = Dot(ec.get_anchors()[145])
 		q_label = MathTex('Q').next_to(q, DOWN)
 		r = Dot(ec.get_anchors()[174])
-		r_label = MathTex('-R').next_to(r, DOWN+RIGHT)
+		r_label = MathTex('-P').next_to(r, RIGHT)
 		# print(ec.get_anchors())
 		rp = Dot([r.get_center()[0], -r.get_center()[1], 0])
-		rp_label = MathTex("R").next_to(rp, RIGHT)
+		rp_label = MathTex("P").next_to(rp, RIGHT)
 		line = Line(p.get_center(), q.get_center()).scale(5)
-		line2 = Line(r.get_center(), rp.get_center()).scale(5)
+		line2 = Line(r.get_center(), rp.get_center()).scale(10)
 		# self.add(ec, ax, p, q, r, line, rp, p_label, q_label, r_label, rp_label)
 		self.add(ax)
 		self.play(Create(ec))
@@ -251,42 +272,44 @@ class PointAddition(MovingCameraScene):
 			GrowFromCenter(r),
 			GrowFromCenter(r_label)
 		)
-		self.play(
-			Wiggle(r),
-			Wiggle(r_label)
-		)
-		r_copy = r.copy()
-		self.add(r_copy)
-		self.play(
-			r_copy.animate.move_to(rp.get_center())
-		)
-		self.play(
-			GrowFromCenter(rp_label)
-		)
-		sum = MathTex('P + Q = R').move_to([-3, 3, 0])
-		self.play(Write(sum))
-		self.play(
-			Circumscribe(r_label)
-		)
-		self.play(
-			FadeOut(p),
-			FadeOut(p_label),
-			FadeOut(q),
-			FadeOut(q_label),
-			FadeOut(line)
-		)
-		self.play(
-			Create(line2)
-		)
-		hmmm = Text('???').move_to(r.get_center()+UP*10)
-		self.add(hmmm)
-		self.play(
-			self.camera.frame.animate.shift(UP*10)
-		)
-		id = MathTex(r'\mathcal{O}').move_to(hmmm.get_center())
-		self.play(
-			Transform(hmmm, id)
-		)
+		# self.play(
+		# 	Wiggle(r),
+		# 	Wiggle(r_label)
+		# )
+		# r_copy = r.copy()
+		# self.add(r_copy)
+		# self.play(
+		# 	r_copy.animate.move_to(rp.get_center())
+		# )
+		# self.play(
+		# 	GrowFromCenter(rp),
+		# 	GrowFromCenter(rp_label)
+		# )
+		sum = MathTex(r'-P + P = \mathcal{O}').move_to([4, -1, 0])
+		# self.play(Write(sum))
+		# self.play(
+		# 	Circumscribe(r_label)
+		# )
+		# self.play(
+		# 	FadeOut(p),
+		# 	FadeOut(p_label),
+		# 	FadeOut(q),
+		# 	FadeOut(q_label),
+		# 	FadeOut(line)
+		# )
+		# self.play(
+		# 	Create(line2)
+		# )
+		# self.play(Write(sum))
+		# hmmm = Text('???').move_to(r.get_center()+UP*10)
+		# self.add(hmmm)
+		# self.play(
+		# 	self.camera.frame.animate.shift(UP*10)
+		# )
+		# id = MathTex(r'\mathcal{O}').move_to(hmmm.get_center())
+		# self.play(
+		# 	Transform(hmmm, id)
+		# )
 
 class Identity(Scene):
 	def construct(self):
@@ -379,13 +402,22 @@ class ECtoFF(Scene):
 		pts = np.argwhere(diffs==0)
 		dots = VGroup(*[Dot(point=ax.coords_to_point(pt[0], pt[1]), color=ORANGE, radius=0.15) for pt in pts])
 		mod_formula = MathTex(r'E: Y^2 = X^3 + AX + B \mod N')
-		self.play(
-			Create(ec),
-			Write(formula)
-		)
+		# self.play(
+		# 	Create(ec),
+		# 	Write(formula)
+		# )
+		ec_copy = ec.copy()
+		formula_copy = formula.copy()
+		self.add(ec, formula)
+		self.wait(2)
 		self.play(
 			Transform(ec, dots),
 			Transform(formula, mod_formula)
+		)
+		self.wait(2)
+		self.play(
+			Transform(ec, ec_copy),
+			Transform(formula, formula_copy)
 		)
 
 class AAOps(Scene):
@@ -407,7 +439,7 @@ class ModAdd(Scene):
 	def construct(self):
 		circle = Circle(radius=2)
 		line = Line(ORIGIN, UP*2).rotate_about_origin(-2*PI/12)
-		label = MathTex('1 + ', '0', r'\mod 12 =', '1').shift(2.5*UP)
+		label = MathTex('1 + ', '0', r'\equiv 1 \mod 12').shift(2.5*UP)
 		self.play(
 			Create(circle),
 			Create(line),
@@ -416,24 +448,24 @@ class ModAdd(Scene):
 		for i in range(2, 16):
 			self.play(
 				line.animate.rotate_about_origin(-2*PI/12),
-				Transform(label, MathTex(f'1 + {i-1} \\mod 12 = {i % 12}').shift(2.5*UP))
+				Transform(label, MathTex(f'1 + {i-1} \\equiv {i % 12} \\mod 12').shift(2.5*UP))
 			)
 
 class ModSub(Scene):
 	def construct(self):
 		circle = Circle(radius=2)
 		line = Line(ORIGIN, UP*2).rotate_about_origin(-2*PI/12*4)
-		label = MathTex(r'4 - 0 \mod 12 = 4').shift(2.5*UP)
+		label = MathTex(r'4 - 0 \equiv 4 \mod 12').shift(2.5*UP)
 		self.add(circle, line, label)
-		for i in range(1, 6):
+		for i in range(1, 17):
 			self.play(
 				line.animate.rotate_about_origin(2*PI/12),
-				Transform(label, MathTex(f'4 - {i} \\mod 12 = {(4 - i) % 12}').shift(2.5*UP))
+				Transform(label, MathTex(f'4 - {i} \\equiv {(4-i) % 12} \\mod 12').shift(2.5*UP))
 			)
 
 class ModMul(Scene):
 	def construct(self):
-		prop = MathTex(r'(a \cdot b) \mod n', '=', r'(a \mod n)', r'(b \mod n)', r'\mod n')
+		prop = MathTex(r'(a \cdot b) \mod n', '\equiv', r'(a \mod n)', r'(b \mod n)', r'\mod n')
 		self.play(Write(prop))
 		self.play(ShowPassingFlash(Underline(prop[0])))
 		self.play(ShowPassingFlash(Underline(prop[2])))
@@ -479,7 +511,7 @@ class GCDEx(MovingCameraScene):
 		self.play(FadeOut(func))
 		gcd_one = MathTex(r'au + bv = 1 \mod b')
 		intermediate = MathTex(r'au - 1 = -bv \mod b')
-		final = MathTex(r'au = 1 \mod b')
+		final = MathTex(r'au \equiv 1 \mod b')
 		self.play(
 			Transform(ex2, gcd_one)
 		)
@@ -645,17 +677,20 @@ class Lenstra(Scene):
 
 class EndQuote(Scene):
 	def construct(self):
-		escher_blank = ImageMobject('media/images/escher_blank.jpg').scale(600/930).shift(LEFT*4)
-		escher_filled = ImageMobject('media/images/escher_filled.jfif').scale(600/390).shift(LEFT*4)
-		self.play(FadeIn(escher_blank))
+		# escher_blank = ImageMobject('media/images/escher_blank.jpg').scale(600/930).shift(LEFT*4)
+		# escher_filled = ImageMobject('media/images/escher_filled.jfif').scale(600/390).shift(LEFT*4)
+		# self.play(FadeIn(escher_blank))
+		lenstra = ImageMobject('media/images/lenstra_award.jfif').scale(2).shift(LEFT*4)
+		self.add(lenstra)
 		quote = Text(
 			"The main application of \n"
 			"Pure Mathematics is to \n"
 			"make you happy \n"
 			"		---Hendrik Lenstra"
 		).shift(RIGHT*3)
-		self.play(AddTextLetterByLetter(quote))
-		self.play(
-			FadeOut(escher_blank),
-			FadeIn(escher_filled)
-		)
+		self.add(quote)
+		# self.play(AddTextLetterByLetter(quote))
+		# self.play(
+		# 	FadeOut(escher_blank),
+		# 	FadeIn(escher_filled)
+		# )
